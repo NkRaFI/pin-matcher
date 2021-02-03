@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pin Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main>
+        <div class="container">
+            <div class="notify-section py-3">
+                <p id="incorrect-pin" class="notify">❌ Pin Didn't Match, Please try again</p>
+                <p id="correct-pin" class="notify">✅ Pin Matched... Secret door is opening for you</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="pin-generator half-width">
+                        <input id="pin-input" class="form-control" type="text">
+                        <button onclick="generatedPinInput()" class="generate-btn">Generate Pin</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-section half-width">
+                        <input id="calculator-input" class="form-control" type="text">
+                        <div class="numbers">
+                            <div id="calculator-digit" class="calc-body">
+                                <div class="calc-button-row">
+                                    <div class="button">7</div>
+                                    <div class="button">8</div>
+                                    <div class="button">9</div>
+                                </div>
+                                <div class="calc-button-row">
+                                    <div class="button">4</div>
+                                    <div class="button">5</div>
+                                    <div class="button">6</div>
+                                </div>
+                                <div class="calc-button-row">
+                                    <div class="button">1</div>
+                                    <div class="button">2</div>
+                                    <div class="button">3</div>
+                                </div>
+                                <div class="calc-button-row">
+                                    <div class="button">B</div>
+                                    <div class="button">0</div>
+                                    <div class="button">C</div>
+                                </div>
+                                <div>
+                                    <button id="for-try-count" onclick="pinVerification()" type="submit"
+                                        class="submit-btn">Submit</button>
+                                    <p class="action-left"> <span id="try-counter">3</span> try left</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+
+    <!-- javascript start -->
+    <script>
+        function generateRandomNumber() {
+            let randomNumber = Math.random() * 10000;
+            let pin = (randomNumber + '').split('.')[0];
+            if (pin.length === 4) {
+                return pin;
+            }
+            else {
+                return generateRandomNumber();
+            }
+        }
+
+        //set to input
+        function generatedPinInput() {
+            let pinInput = document.getElementById("pin-input");
+            pinInput.value = generateRandomNumber();
+        }
+
+        //calculator digit handler
+        document.getElementById("calculator-digit").addEventListener("click", function (event) {
+            let getDigit = event.target.innerText;
+            if (isNaN(getDigit)) {
+                //handle backspace
+                //handle clear
+                if (getDigit === "C") {
+                    let digitInput = document.getElementById("calculator-input");
+                    digitInput.value = '';
+                }
+                if (getDigit === "B") {
+                    let digitInput = document.getElementById("calculator-input");
+                    let digitInputValue = (digitInput.value).split('');
+                    let digitInputDelete = digitInputValue.pop();
+                    let digitInputJoin = digitInputValue.join('');
+                    digitInput.value = digitInputJoin;
+                }
+            }
+            else {
+                let digitInput = document.getElementById("calculator-input");
+                digitInput.value = digitInput.value + getDigit;
+            }
+        })
+
+        //verification function
+        function pinVerification() {
+            let pinInput = document.getElementById("pin-input").value;
+            let digitInput = document.getElementById("calculator-input").value;
+            if (pinInput === digitInput) {
+                //if generate pin section's input empty than gives an alert and both correct-pin and incorrect-pin sections are display none
+                if (pinInput == '') {
+                    alert("please generate a pin first")
+                    document.getElementById("correct-pin").style.display = "none"
+                    document.getElementById("incorrect-pin").style.display = "none"
+                }
+                else {
+                    document.getElementById("correct-pin").style.display = "block"
+                    document.getElementById("incorrect-pin").style.display = "none"
+                }
+            }
+            else {
+                //if digit pin section's input empty than gives an alert and both correct-pin and incorrect-pin sections are display none
+                if (digitInput == '') {
+                    alert("you didn't entered any pin")
+                    document.getElementById("correct-pin").style.display = "none"
+                    document.getElementById("incorrect-pin").style.display = "none"
+                }
+                else {
+                    document.getElementById("incorrect-pin").style.display = "block";
+                    document.getElementById("correct-pin").style.display = "none";
+                }
+                //this section is for counting how many try is left and show it to the try section in the dom
+                //when 0 try left the submit button will be disabled
+                let tryCount = document.getElementById("try-counter");
+                let tryCountInNumber = parseInt(tryCount.innerText);
+                if (tryCountInNumber > 0) {
+                    tryCountInNumber--;
+                    tryCount.innerText = tryCountInNumber;
+                }
+                if (tryCountInNumber == 0) {
+                    let submitButton = document.getElementById("for-try-count");
+                    submitButton.disabled = true;
+                    submitButton.setAttribute("title", "0 try left. you can't try more");
+                    submitButton.style.backgroundColor = "#2E3150"
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
